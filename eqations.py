@@ -11,7 +11,7 @@ from numpy import *  #pi, sin, cos, sqrt, log, tan, atan
 
 #from field import *
 #from field_FT2 import *
-from field_EXL_50U_13976 import *
+from field_EXL import *
 
 
 def integrand(x):
