@@ -448,7 +448,7 @@ def fin_fun(t,y,eqq,m0,ccc,a,R0,delr,delfi,nfi,n,pparini,pperpini,muini):
     return(dydt)
 
 #from parameters_FT2_r_3 import *
-from parameters_EXL_50U_13976 import *
+from parameters import *
 t_ini=0.2*ccc_R0/tau_norm
 t0c=t_ini
 sf0=spl_q0(t0c)

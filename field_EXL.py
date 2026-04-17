@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import CubicSpline
-from parameters_EXL_50U_13976 import *
+from parameters import *
 
 
 t0U=0     #22  # ms,
