@@ -46,14 +46,14 @@ for it in range(num_it):
     sfb=spl_qa(t0c)
     Uloop=spl_U(t0c)
     B0=spl_B(t0c)
-    logger.info(f't_ini={t0c} sf0={sf0} sfb={sfb} B0={B0} Uloop={Uloop}')
+    logger.info(f't_ini= {t0c}, sf0= {sf0}, sfb={sfb}, B0= {B0}, Uloop= {Uloop}')
     sf=saf_fact(sf0,sfb,rini,a,Uloop)
-    logger.info(f'rini={rini} thetini={thetini} fiini={fiini} pparini= {pparini}')
+    logger.info(f'rini= {rini}, thetini= {thetini}, fiini= {fiini}, pparini= {pparini}')
 
     y0= [pparini,rini,thetini,fiini,pperp2ini,Bpolini,Btotini,Bradini,Btorini,psipolini,psitorini,energyini]
     #y0=[pparini,rini,thetini,fiini]
     time= t_ini + delt  #t1UL
-    logger.info(f'rini= {rini}, thetini= {thetini}, fiini={fiini}, pparini={pparini}, energyini={energyini}')
+    logger.info(f'rini= {rini}, thetini= {thetini}, fiini= {fiini}, pparini= {pparini}, energyini= {energyini}')
     logger.info(f't_ini(s)= {t_ini*R0/ccc*tau_norm}, del_t_calculation(s)= {(time-t_ini)*R0/ccc*tau_norm}, time(s)={time*R0/ccc*tau_norm}')
    
     sol= solve_ivp(fin_fun,
