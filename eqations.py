@@ -2,7 +2,6 @@ from loguru import logger
 import numpy as np
 import numba 
 from numba import njit
-import scipy.special.cython_special as cs
 from scipy.integrate import odeint 
 from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
@@ -15,7 +14,7 @@ from numpy import pi, sin, cos, sqrt, log, tan, atan
 #from field_FT2 import *
 from field_EXL import *
 
-numba.config.DISABLE_JIT = True
+numba.config.DISABLE_JIT = False
 logger.info(f"Disable numba: {numba.config.DISABLE_JIT}")
 
 @njit
