@@ -29,15 +29,17 @@ if os.path.exists("result_11_equations_EXL_50U_13976_r_0.2_t_0.1_00"
 print('rini=',rini,'thetini=',thetini,'fiini=',fiini,'pparini=',pparini,'energyini=',energyini)
 #exit()
 
-num_it=2000
-nrange=20000
+num_it=5
+nrange=2000
 delt=200000
 #result_df = pd.DataFrame(columns=['pparnp', 'rnp', 'finp', 'thetnp', 'tnp1',])
 result_df = pd.DataFrame(columns=['pparini','rini','thetini','fiini','pperp2ini','Bpolini','Btotini','Bradini','Btorini','psipolini','psitorini','energyini','t_ini',])
 
+import time as timer
 from scipy.integrate import odeint,solve_ivp    
 for it in range(num_it):
     print(f"num it={it}")
+    start_time = timer.time()
     t0c=t_ini
     sf0=spl_q0(t0c)
     sfb=spl_qa(t0c)
@@ -100,8 +102,9 @@ for it in range(num_it):
         })
     #print(df.head)
     result_df = pd.concat([result_df, df])
-    print(result_df.head)
+    #print(result_df.head)
     result_df.to_pickle('result_11_equations_EXL_50U_13976_r_0.2_t_0.2_.pkl') 
+    print(f"----- Iteration execution time: {(timer.time() - start_time):0.2f} sec -----")
 #    df.to_pickle('final_data.pkl') 
 #LSODA
 #DOP853
