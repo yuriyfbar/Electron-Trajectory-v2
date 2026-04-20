@@ -84,7 +84,7 @@ for it in range(num_it):
                    atol= 1e-10) 
     logger.info(f"Number of function evaluations {sol.nfev}")
 
-    t_ini=sol.t[nrange-1]
+    t_ini=sol.t[-1]
     y_last = sol.y[:, -1]
     pparini, rini, thetini, fiini, pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini = y_last
 
