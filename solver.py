@@ -73,7 +73,7 @@ for it in range(num_it):
     time= t_ini + delt  #t1UL
     logger.info(f'rini= {rini}, thetini= {thetini}, fiini= {fiini}, pparini= {pparini}, energyini= {energyini}')
     logger.info(f't_ini(s)= {t_ini*R0/ccc*tau_norm}, del_t_calculation(s)= {(time-t_ini)*R0/ccc*tau_norm}, time(s)={time*R0/ccc*tau_norm}')
-   
+    logger.info(f'solve_ivp: method= DOP853, t_eval={nrange}')
     sol= solve_ivp(fin_fun,
                    [t_ini, time], 
                    y0, 
@@ -113,7 +113,10 @@ for it in range(num_it):
     result_df = pd.concat([result_df, df])
     #print(result_df.head)
     result_df.to_pickle('result_11_equations_EXL_50U_13976_r_0.2_t_0.2_.pkl') 
-    logger.info(f"----- Iteration {it}. Execution time: {(timer.time() - start_time):0.2f} sec -----")
+    
+    eval_time = timer.time() - start_time
+    logger.info(f"Number of function evaluations per sec {(sol.nfev/eval_time):0.2f}")
+    logger.info(f"----- Iteration {it}. Execution time: {eval_time:0.2f} sec -----")
 #    df.to_pickle('final_data.pkl') 
 #LSODA
 #DOP853
