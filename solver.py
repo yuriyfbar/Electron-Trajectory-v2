@@ -1,8 +1,8 @@
 import os
-
+from logger_config import logger
 from eqations import *
 
-print('++++++++++++++++')
+logger.info('+++++++  start  +++++++++')
 if os.path.exists("result_11_equations_EXL_50U_13976_r_0.2_t_0.1_00"
 ".pkl"):
     print('----------------')
@@ -26,7 +26,8 @@ if os.path.exists("result_11_equations_EXL_50U_13976_r_0.2_t_0.1_00"
     t_ini = last_row['t_ini']
     thetini=thetini-int(thetini/(2*pi))*2*pi
     fiini=fiini-int(fiini/(2*pi))*2*pi
-print('rini=',rini,'thetini=',thetini,'fiini=',fiini,'pparini=',pparini,'energyini=',energyini)
+
+logger.info(f'rini= {rini}, thetini={thetini}, fiini={fiini}, pparini= {pparini}, energyini= {energyini}')
 #exit()
 
 num_it=5
@@ -38,22 +39,22 @@ result_df = pd.DataFrame(columns=['pparini','rini','thetini','fiini','pperp2ini'
 import time as timer
 from scipy.integrate import odeint,solve_ivp    
 for it in range(num_it):
-    print(f"num it={it}")
+    logger.info(f"num it={it}")
     start_time = timer.time()
     t0c=t_ini
     sf0=spl_q0(t0c)
     sfb=spl_qa(t0c)
     Uloop=spl_U(t0c)
     B0=spl_B(t0c)
-    print('t_ini=',t0c,'sf0=',sf0,'sfb=',sfb,'B0=',B0,'Uloop=',Uloop)
+    logger.info(f't_ini={t0c} sf0={sf0} sfb={sfb} B0={B0} Uloop={Uloop}')
     sf=saf_fact(sf0,sfb,rini,a,Uloop)
-    print('rini=',rini,'thetini=',thetini,'fiini=',fiini,'pparini=',pparini)
+    logger.info(f'rini={rini} thetini={thetini} fiini={fiini} pparini= {pparini}')
 
     y0= [pparini,rini,thetini,fiini,pperp2ini,Bpolini,Btotini,Bradini,Btorini,psipolini,psitorini,energyini]
     #y0=[pparini,rini,thetini,fiini]
     time= t_ini + delt  #t1UL
-    print('rini=',rini,'thetini=',thetini,'fiini=',fiini,'pparini=',pparini,'energyini=',energyini)
-    print('t_ini(s)=',t_ini*R0/ccc*tau_norm,'del_t_calculation(s)=',(time-t_ini)*R0/ccc*tau_norm,'time(s)=',time*R0/ccc*tau_norm)
+    logger.info(f'rini= {rini}, thetini= {thetini}, fiini={fiini}, pparini={pparini}, energyini={energyini}')
+    logger.info(f't_ini(s)= {t_ini*R0/ccc*tau_norm}, del_t_calculation(s)= {(time-t_ini)*R0/ccc*tau_norm}, time(s)={time*R0/ccc*tau_norm}')
    
     sol= solve_ivp(fin_fun,
                    [t_ini, time], 
@@ -104,7 +105,7 @@ for it in range(num_it):
     result_df = pd.concat([result_df, df])
     #print(result_df.head)
     result_df.to_pickle('result_11_equations_EXL_50U_13976_r_0.2_t_0.2_.pkl') 
-    print(f"----- Iteration execution time: {(timer.time() - start_time):0.2f} sec -----")
+    logger.info(f"----- Iteration execution time: {(timer.time() - start_time):0.2f} sec -----")
 #    df.to_pickle('final_data.pkl') 
 #LSODA
 #DOP853
