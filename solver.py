@@ -42,17 +42,16 @@ logger.info(f'rini= {rini}, thetini={thetini}, fiini={fiini}, pparini= {pparini}
 num_it=20
 nrange=10000
 delt=200000
-logger.info(f"num_it= {num_it}")
-logger.info(f"nrange= {nrange}")
-
+logger.info(f"num_it= {num_it}, nrange= {nrange}")
+logger.info(f"------------------------------------------------------------")
 # Open the HDF5 file for writing (this will overwrite the old file)
+start_time_full = time.time()
 file_name ='results/full_trajectory.h5'
 with pd.HDFStore(file_name, mode='w') as store:
-    logger.info(f" Open the HDF5 file :  {file_name}")
+    logger.info(f"Open the HDF5 file :  {file_name}")
     t_start = t_ini
     for it in range(num_it):
-        logger.info(f"   ")
-        logger.info(f"----- Iteration {it}. Start ----- ")
+        logger.info(f"Iteration {it}. Start")
         log_memory_usage()
         start_time = time.time()
         t0c=t_start
@@ -103,7 +102,10 @@ with pd.HDFStore(file_name, mode='w') as store:
         del sol
         del all_data
         gc.collect()
-        logger.info(f"----- Iteration {it}. Execution time: {eval_time:0.2f} sec -----")
+        logger.info(f"Iteration {it}. Execution time: {eval_time:0.2f} sec")
+        logger.info(f"------------------------------------------------------------")
+
+logger.info(f"Full execution time: {time.time() - start_time_full:0.2f} sec")        
 
 #LSODA
 #DOP853
