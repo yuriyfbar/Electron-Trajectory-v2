@@ -1,3 +1,4 @@
+import gc
 import os
 from logger_config import log_memory_usage, logger
 from eqations import *
@@ -26,7 +27,7 @@ logger.info('+++++++  start  +++++++++')
 logger.info(f'rini= {rini}, thetini={thetini}, fiini={fiini}, pparini= {pparini}, energyini= {energyini}')
 #exit()
 
-num_it=10
+num_it=20
 nrange=2000
 delt=200000
 #result_df = pd.DataFrame(columns=['pparnp', 'rnp', 'finp', 'thetnp', 'tnp1',])
@@ -90,7 +91,10 @@ with pd.HDFStore(file_name, mode='w') as store:
 
         # Инкрементная запись в HDF5 (без concat и перезаписи всего файла)
         store.append('trajectory', df, index=False)
-
+        del df
+        del sol
+        del all_data
+        gc.collect()
         logger.info(f"----- Iteration {it}. Execution time: {eval_time:0.2f} sec -----")
 
 #LSODA
