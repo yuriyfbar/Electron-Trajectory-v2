@@ -12,9 +12,9 @@ parameters.a, parameters.R0, parameters.delr, parameters.delfi, parameters.nfi =
 
 from parameters import *
 # eval const
-parameters.ccc_R0=ccc/R0
-parameters.cvr=m0/eqq
-parameters.cvr1=m01/eqq1
+parameters.ccc_R0=parameters.ccc/parameters.R0
+parameters.cvr=parameters.m0/parameters.eqq
+parameters.cvr1=parameters.m01/parameters.eqq1
 
 from eqations import *
 
@@ -47,7 +47,7 @@ delt=200000
 columns_list = ['ppar','r','thet','fi','pperp2','Bpol','Btot','Brad','Btor','psipol','psitor','energy','time',]
 
 # Open the HDF5 file for writing (this will overwrite the old file)
-file_name ='full_trajectory.h5'
+file_name ='results/full_trajectory.h5'
 with pd.HDFStore(file_name, mode='w') as store:
     logger.info(f" Open the HDF5 file :  {file_name}")
     t_start = t_ini
