@@ -184,3 +184,4 @@ uv.lock
 *.prof
 *.lprof
 *.h5
+*.svg
