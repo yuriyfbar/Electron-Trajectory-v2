@@ -183,3 +183,4 @@ uv.lock
 *.pkl
 *.prof
 *.lprof
+*.h5
