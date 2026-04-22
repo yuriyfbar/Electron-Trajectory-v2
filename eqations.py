@@ -10,9 +10,9 @@ from numpy import pi, sin, cos, sqrt, log, tan, atan
 
 from field_EXL import *
 
-numba.config.DISABLE_JIT = False
+numba.config.DISABLE_JIT = False # type: ignore
 
-logger.info(f"Disable numba: {numba.config.DISABLE_JIT}")
+logger.info(f"Disable numba: {numba.config.DISABLE_JIT}") # type: ignore
 
 @njit
 def integrand(x):
