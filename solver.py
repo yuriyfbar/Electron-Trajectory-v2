@@ -54,27 +54,30 @@ for it in range(num_it):
     t_end= t_start + delt  #t1UL
     logger.info(f'rini= {rini}, thetini= {thetini}, fiini= {fiini}, pparini= {pparini}, energyini= {energyini}')
     logger.info(f't_start(s)= {t_start*R0/ccc*tau_norm}, del_t_calculation(s)= {(t_end-t_start)*R0/ccc*tau_norm}, time(s)={t_end*R0/ccc*tau_norm}')
-    logger.info(f'solve_ivp: method= DOP853, t_eval={nrange}')
-
+    #logger.info(f'solve_ivp: method= DOP853, t_eval={nrange}')
+    logger.info(f'solve_ivp: method= DOP853, dense_output=True')
     sol= solve_ivp(fin_fun,
                    [t_start, t_end], 
                    y0, 
                    method='DOP853', 
-                   t_eval= np.linspace(t_start, t_end, nrange), 
+                   dense_output=True, 
                    args=(eqq, m0, ccc, a, R0, delr, delfi, nfi, n, pparini, pperpini, muini),
                    rtol= 1e-7,
                    atol= 1e-10) 
     logger.info(f"Number of function evaluations {sol.nfev}")
 
-    t_start=sol.t[-1]
-    y_last = sol.y[:, -1]
+    t_steps = np.linspace(t_start, t_end, nrange)
+    all_data = sol.sol(t_steps) # Получаем все данные разом!
+
+    t_start= t_steps[-1]
+    y_last = all_data[:, -1]
     pparini, rini, thetini, fiini, pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini = y_last
 
     thetini=thetini-int(thetini/(2*pi))*2*pi
     fiini=fiini-int(fiini/(2*pi))*2*pi
 
-    df = pd.DataFrame(sol.y.T, columns=columns_list[0:-1])
-    df['time'] =  sol.t
+    df = pd.DataFrame(all_data.T, columns=columns_list[0:-1])
+    df['time'] =  t_steps
 
     logger.debug("\n" + df.head().to_string())
     result_df = pd.concat([result_df, df])

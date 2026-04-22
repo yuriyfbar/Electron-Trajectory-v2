@@ -1,6 +1,7 @@
-# from math import tan, atan
+from loguru import logger
 import numpy as np
-import scipy.special as sc
+import numba 
+from numba import njit
 from scipy.integrate import odeint 
 from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
@@ -13,22 +14,27 @@ from numpy import pi, sin, cos, sqrt, log, tan, atan
 #from field_FT2 import *
 from field_EXL import *
 
+numba.config.DISABLE_JIT = False
+logger.info(f"Disable numba: {numba.config.DISABLE_JIT}")
 
+@njit
 def integrand(x):
     return x/sqrt(1-x**2)
+@njit
 def integrandn(x,n):
     return(x**(n+1)/sqrt(1-x**2))
+@njit
 def integrandn1(x,n):
     if abs(x)>0.002:
         y=x**n*(1.-1./sqrt(1.-x**2))
     else:
         y=-x**(n+2)*0.5*(1.+3.*x**2/4)
     return(y)
-
+@njit
 def E0_field(r,thet,fi,R0,Uloop):
     E0tor=Uloop/(2*pi*R0)
     return(E0tor)
-    
+@njit    
 def E_field(r,thet,fi,R0,E0tor):
     Etor=E0tor*R0/(R0+r*cos(thet))
     Erad=0.
@@ -48,12 +54,12 @@ def E_field(r,thet,fi,R0,E0tor):
 #    Bpol1=B0/(R0*sf)/(1+r/R0*cos(thet))
 #    Bpol=Bpol1*r
 #    return(Bpol,Bpol1)
-
+@njit
 def saf_fact(sf0,sfb,r,a,Uloop):
     sf=sf0+(sfb-sf0)*(r/a)**2
 #    sf=sf*np.sign(Uloop)
     return(sf)
-
+@njit
 def fn(x,n):
     res1=0.
     if abs(x) >=5.e-2:
@@ -67,6 +73,59 @@ def fn(x,n):
         res1=res1*(-1)**n/(1+x)
     return(res1)
 
+@njit
+def fast_hyp_part(x, n, terms=10):
+    """
+    Аппроксимация hyp2f1(0.5, (2+n)/2, (4+n)/2, x^2) / (2+n)
+    через степенной ряд.
+    """
+    x2 = x**2
+    a = 0.5
+    b = (2.0 + n) / 2.0
+    c = (4.0 + n) / 2.0
+    
+    # Первый член ряда (k=0) всегда 1
+    hyp_sum = 1.0
+    current_term = 1.0
+    
+    # Итерируемся для точности (10-15 итераций обычно за глаза при x < 0.9)
+    for k in range(1, terms):
+        # Рекуррентное отношение для следующего члена ряда
+        # (a+k-1)*(b+k-1) / ((c+k-1)*k) * z
+        multiplier = ((a + k - 1) * (b + k - 1)) / ((c + k - 1) * k) * x2
+        current_term *= multiplier
+        hyp_sum += current_term
+        
+        # Если член ряда стал ничтожно мал, выходим раньше
+        if abs(current_term) < 1e-12:
+            break
+            
+    return (x**(n + 2)) * hyp_sum / (2.0 + n)
+@njit
+def fast_hyp2f1_specific(x, n, terms=15):
+    """
+    Аппроксимация hyp2f1(0.5, (1+n)/2, (3+n)/2, x^2)
+    через рекуррентный расчет степенного ряда.
+    """
+    x2 = x**2
+    a = 0.5
+    b = (1.0 + n) / 2.0
+    c = (3.0 + n) / 2.0
+    
+    hyp_sum = 1.0
+    current_term = 1.0
+    
+    for k in range(1, terms):
+        # Формула: term_{k} = term_{k-1} * (a+k-1)*(b+k-1) / ((c+k-1)*k) * z
+        multiplier = ((a + k - 1) * (b + k - 1)) / ((c + k - 1) * k) * x2
+        current_term *= multiplier
+        hyp_sum += current_term
+        
+        if abs(current_term) < 1e-14:
+            break
+            
+    return hyp_sum
+@njit
 def Mag_field(r,thet,fi,R0,a,B0,delfi,nfi,delr,n,sf0,sfb,Uloop):
     x=r/R0
     R=R0+r*cos(thet)
@@ -91,153 +150,83 @@ def Mag_field(r,thet,fi,R0,a,B0,delfi,nfi,delr,n,sf0,sfb,Uloop):
         for i in range(1,10):
             bpr=bpr+(-1)**(n+1+i)*i*xpr**(i-1)/(n+2.+i)
         dFndthet=-((-1)**n/(1+xpr)**2*apr+(-1)**(n+1)/(1+xpr)*bpr)*x*sin(thet)    
-#    print(xpr,dFndthet)
-#    sys.exit()
+
     Brad1=Gpr*(1./R0)*Fpr
     Brad=r*Brad1
-#    print('r,Brad',r,Brad,'Gpr,Fpr',Gpr,Fpr)
-#######################################3333
-#    poloidal field calculation
+
     psi0=2*pi*B0*R0**2
     psi0n=psi0*(R0/a)**n
-#    psi0n1=psi0/R0/((n+1)*a**n)
-#    A=psi0*(1-sqrt(1-x**2))
-#    if(x**2>1):
-#        print('x=',x,'r=',r)
-#        exit()
+
     if x>0.02:
         res=1.-sqrt(1.-x**2)
     else:
         res=x**2/2.*(1.+x**2/4.*(1.+x**2/2.*(1.+5.*x**2/16.)))
-#    print(x,res,res1)
-#    sys.exit()
+
     A1=psi0*res
-#    print(res)
-#    sys.exit()
-#    A1=psi0*res[0]
-#    print(A,A1,A1/A,psi0)
-#    print('A1',A1)
-    resn=x**(n+2)*sc.hyp2f1(0.5,(2.+n)/2,(4.+n)/2,x**2)/(2+n)
-#    print('resn',resn)
+
+    resn=x**(n+2)*fast_hyp_part(x, n)/(2+n)
+
     An=psi0n*resn
-#    print('resn',resn)
-#    An=psi0n*resn[0]
-#    print('An',An)
-#    resn1=quad(integrandn1,0.,r/R0,args=(n))
-#    An1=psi0n*resn1[0]
-    resn1=-x**(1+n)*(-1.+sc.hyp2f1(0.5,(1.+n)/2,(3.+n)/2,x**2))/(1+n)
+
+    resn1=-x**(1+n)*(-1.+fast_hyp2f1_specific(x,n))/(1+n)
     An1=psi0n*resn1
 
-#    print('An1',An1)
     psitor=A1+(An+delr*An1)*delfi*cos(nfi*fi)
-#    psitor1=pi*r**2*B0
 
-#    sys.exit()
     A1=psitor
     rpsi=(R0/abs(psi0))*sqrt((2*psi0-A1)*A1)
     sf=saf_fact(sf0,sfb,rpsi,a,Uloop)
     sf1=saf_fact(sf0,sfb,r,a,Uloop)
 
-#    Bpol,Bpol1=Bpol_f(r,thet,sf,B0,R0)
-#    print('Bpol',Bpol)
-    
     dpsidA1=1.
     dA1dr=(psi0/R0)*x/sqrt(1-x**2)
     dpsidAn=delfi*cos(nfi*fi)
     dAndr=psi0n/R0*integrandn(x,n)     #*(n+1+x**2/(1.-x**2))
     dpsidAn1=delr*delfi*cos(nfi*fi)
-#    print('psi0n1',psi0n1,n,r**(n-1))
+
     dAn1dr=psi0n*integrandn1(x,n)
     dpsidr=dpsidA1*dA1dr+dpsidAn*dAndr+dpsidAn1*dAn1dr
     dsfdpsi=2.*(sfb-sf0)*(psi0-psitor)*(R0/a)**2/psi0**2*np.sign(B0)
     dsfdr=dsfdpsi*dpsidr
     Bpol=dpsidr/sf/(R*2.*pi)*np.sign(B0)
-#    sys.exit()
+
     Bpol1=Bpol/r
     dpsidAndfi=-nfi*delfi*sin(nfi*fi)
     dpsidAn1dfi=-nfi*delr*delfi*sin(nfi*fi)
     dpsidrdfi=(dpsidAndfi*dAndr+dpsidAn1dfi*dAn1dr)
     dpsidfi=-(An+delr*An1)*nfi*delfi*sin(nfi*fi)
     dsfdfi=dsfdpsi*dpsidfi
-#    print('dpsidA1*dA1dr=',dpsidA1*dA1dr,'dpsidAn*dAndr=',dpsidAn*dAndr,'dpsidAn1*dAn1dr=',dpsidAn1*dAn1dr)
-#    print('dpsidr=',dpsidr,'dsfdpsi*dsfdr=', dsfdpsi*dsfdr)
-#    print(dpsidA1*dA1dr,dpsidAn*dAndr,dpsidAn1*dAn1dr,dpsidr,dsfdpsi*dsfdr)
-    
-#    dBtordfinp
-    ########################33
+
     Btot=sqrt(Btor**2+Bpol**2+Brad**2)
     brad=Brad/Btot
     bpol=Bpol/Btot
     bpol1=Bpol1/Btot
     btor=Btor/Btot
-#    print('brad,bpol,btor=',brad,bpol,btor)
-#    print('Brad,Bpol,Btor=',Brad,Bpol,Btor)
-#    sys.exit()
-    
+
     dBtordr=-Btor*cos(thet)/R+B0*R0/R*delfi*cos(nfi*fi)*(1+delr*cos(thet))*(r/a)**(n-1)*n/a
-#######################################################
-#    dBpoldr=(B0/R)/sf*(1.-xpr/(1.+xpr)-r*dsfdr/sf)
+
     dA1drdr=psi0/(R0**2*(sqrt(1-x**2))**3)
     dAndrdr=psi0n*x**n*(n+1-n*x**2)/(R0**2*(sqrt(1-x**2))**3)
     dAn1drdr=psi0n/R0*(x**(n-1)*(n*(1-1/sqrt(1-x**2))-x**2/(sqrt(1.-x**2))**3))
     dpsidrdr=dpsidA1*dA1drdr+dpsidAn*dAndrdr+dpsidAn1*dAn1drdr
 
-#    dBpoldr=(dpsidrdr-dpsidr*dsfdr/abs(sf)-dpsidr*cos(thet)/R)/(2*pi*R*sf)*np.sign(B0)   #original
-#    dBpoldr=(dpsidrdr-dpsidr*dsfdr/sf-dpsidr*cos(thet)/R)/(2*pi*R*sf)*np.sign(B0)
-#    dBpoldr=(dpsidrdr*np.sign(B0)-dpsidr*dsfdr/abs(sf)-dpsidr*cos(thet)/R)/(2*pi*R*sf)   #correct
+
     dBpoldr=(dpsidrdr-dpsidr*dsfdr/sf*np.sign(B0)-dpsidr*cos(thet)/R)/(2*pi*R*sf)*np.sign(B0) 
-#
-#    print('dpsidr*cos(thet)/R=',dpsidr*cos(thet)/R)
-#    print('dBpoldr=(dpsidrdr-dpsidr*dsfdr/sf-dpsidr*cos(thet)/R)/(2*pi*R*sf)*np.sign(B0)=',  \
-#    (dpsidrdr-dpsidr*dsfdr/sf-dpsidr*cos(thet)/R)/(2*pi*R*sf)*np.sign(B0))
-#######################################################
+
     dBtordfi=-B0/(1+xpr)*delfi*nfi*sin(nfi*fi)*(1.+delr*cos(thet))*(r/a)**n
     dBraddr=(-Brad1*(R0+2.*r*cos(thet))-dBtordfi)/R
-#    dBpoldfi=-(Bpol/sf)*((sfb-sf0)/a**2)*(R0**2/psi0)*((An+delr*An1)*delfi*nfi*sin(nfi*fi))
-#    dBpoldfi=2.*(Bpol/sf)*((sfb-sf0)/a**2)*(R0**2/psi0**2*(psi0-psitor))*((An+delr*An1)*delfi*nfi*sin(nfi*fi))
-#    dBpoldfi=2*B0*x/(1+xpr)/sf**2*(sfb-sf0)*(R0/a/psi0)**2*(psi0-psitor)*(delfi*An+delr*delfi*An1)*sin(nfi*fi)
-#    dBpoldfi=2*B0*x/(1+xpr)/sf**2*(sfb-sf0)*(R0/a/psi0)**2*(psi0-psitor)*delfi*nfi*sin(nfi*fi)*An
-##################################################################
-#    dBpoldfi=(dpsidrdfi/(2*pi*R*sf)-dpsidr*dsfdfi/(sf**2*2.*pi*R))    #original
+
     dBpoldfi=(dpsidrdfi/(2*pi*R*sf)-dpsidr*dsfdfi/(sf**2*2.*pi*R))*np.sign(B0)
-#############################################################
-#    print('dpsidrdfi/(2*pi*R*sf)=',dpsidrdfi/(2*pi*R*sf),'dpsidr*dsfdfi/(sf**2*2.*pi*R)=',dpsidr*dsfdfi/(sf**2*2.*pi*R))
-#    dBpoldfi1=abs(dpsidrdfi/(2*pi*R*sf)-dpsidr*dsfdfi/(sf**2*2.*pi*R))*np.sign(Uloop*B0)
-#    print('dBpoldfi1=',dBpoldfi1,'dBpoldfi=',dBpoldfi)
-#    print('dpsidrdfi/(2*pi*R*sf)=',dpsidrdfi/(2*pi*R*sf),'dpsidr*dsfdfi/(sf**2*2.*pi*R)=',dpsidr*dsfdfi/(sf**2*2.*pi*R))
-#    sys.exit()
+
     dBraddfi=Gpr1*(r/R0)*Fpr
     dBpoldthet1=Bpol*sin(thet)/R
     dBpoldthet=dBpoldthet1*r
-#    print('dBpoldr1=',dBpoldr1,'dBpoldr=',dBpoldr,'dBpoldthet=',dBpoldthet)
 
-#    sys.exit()
-#    dBtordthet1=Btor*r*sin(thet)/R0/(1.+xpr)-B0*delfi*cos(nfi*fi)*delr*sin(thet)/(1+xpr)*(r/a)**(n-1)/a
-#    dBtordthet1=Btor*sin(thet)/R0/(1.+xpr)-B0*delfi*cos(nfi*fi)*delr*sin(thet)/(1+xpr)*(r/a)**(n-1)/a
     dBtordthet1=Btor*sin(thet)/R-B0*delfi*cos(nfi*fi)*delr*sin(thet)/(1+xpr)*(r/a)**(n-1)/a
     dBtordthet=dBtordthet1*r
-#    dFndthet=[
+
     dBraddthet1=Gpr2*(1/R0)*Fpr+Gpr31*dFndthet
     dBraddthet=dBraddthet1*r
-    
-   
-#    dBtotdr=Brad*dBraddr+Bpol*dBpoldr+Btor*dBtordr
-#    dBtotdthet=Brad*dBraddthet+Bpol*dBpoldthet+Btor*dBtordthet
-#    dBtotdfi=Brad*dBraddfi+Bpol*dBpoldfi+Btor*dBtordfi
-#    print('dBraddfi=',dBraddfi,'dBpoldfi=',dBpoldfi,'dBtordfi=',dBtordfi,'dBtotdfi=',dBtotdfi)
-#    print('Brad=',Brad,' Bpol=',Bpol,' Btor=',Btor)
-#    print('sf=',sf)
-#    print('Brad=',Brad,'dBraddr=',dBraddr,'dBraddthet=',dBraddthet,'dBraddfi=',dBraddfi)
-
-#    print('psi0=',psi0,'psi0n=',psi0n)    
-#    print('rpsi',rpsi)
-#    print('sf=',sf,'sf1=',sf1)    
-#    print('psitor=',psitor)
-#    print('dpsidr=',dpsidr,'dsfdpsi=',dsfdpsi,'dsfdr=dsfdpsi*dpsidr=',dsfdr)
-#    print('Bpol=dpsidr/sf/(R*2.*pi)*np.sign(B0)=',dpsidr/sf/(R*2.*pi)*np.sign(B0))
-#    print('dBpoldr=',dBpoldr,'dpsidrdr=',dpsidrdr,'dpsidr*dsfdr/sf=',dpsidr*dsfdr/sf)
-#    print('dBpoldr=',dBpoldr,'dBpoldthet=',dBpoldthet,'dBtordthet1=',dBtordthet1,'dBtordthet=',dBtordthet)
-#    sys.exit()
 
     return(R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
     dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1,psitor,dpsidr,dpsidfi,sf)
