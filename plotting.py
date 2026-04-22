@@ -14,7 +14,7 @@ ccc_R0=ccc/R0
 cvr=m0/eqq
 cvr1=m01/eqq1
 
-df = pd.read_hdf('full_trajectory_1.h5', 'trajectory')
+df = pd.read_hdf('results/full_trajectory_1.h5', 'trajectory')
 df.head
 
 ax = df.plot(x= 'r', y='thet', kind='line', title='My Line Plot')
@@ -63,7 +63,7 @@ ax.set_rmax(1)
 ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
 ax.grid(True)
 #ax.set_title("Electron trajectory in poloidal crossection", va='bottom')
-plt.savefig('FT2_r_0.01_t_15_p_m0.1_segment_4_cross_sect.svg')
+plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.1_segment_4_cross_sect.svg')
 plt.show()
 
 #print('rini=',sol[nrange-1,1])
@@ -89,7 +89,7 @@ plt.xlabel('t(ms)')
 plt.ylim(0.,1.0)
 #plt.xlim(0.348,0.349)
 #plt.xlim(0.328,0.331)
-plt.savefig('FT2_r_0.01_t_15_p_m0.025_segment_4_rto_a.svg')
+plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_rto_a.svg')
 plt.grid()
 plt.show()
 #print('final t(ms)=',tinipr[mmx-1:mmx])
@@ -148,7 +148,7 @@ plt.ylim(0.e7,1.e7)
 #plt.xlim(55.2,55.3)
 #plt.xlim(0.0198,0.02)
 #plt.ylim(7.5e6,7.7e6)
-plt.savefig('FT2_r_0.01_t_15_p_m0.025_segment_4_Wkin.svg')
+plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_Wkin.svg')
 plt.grid()
 plt.show()
 
