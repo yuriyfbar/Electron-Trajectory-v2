@@ -1,14 +1,3 @@
-# physics const
-
-
-m01=9.1094e-28
-ccc1=3.e10
-eqq1=-4.8032e-10 
-m0=9.1094e-31
-eqq=-1.602e-19  
-ccc=3.e8       
-
-
 
 n=0 # power            in dependence of toroidal field ripple on (r/a)**n 
 # solver config

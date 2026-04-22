@@ -5,6 +5,7 @@ from logger_config import log_memory_usage, logger
 import time
 from scipy.integrate import odeint,solve_ivp  
 
+from physical_constants import *
 import parameters
 run_cfg = load_configs('discharges/base_shot.toml')
 log_config(run_cfg)
@@ -12,9 +13,7 @@ parameters.a, parameters.R0, parameters.delr, parameters.delfi, parameters.nfi =
 
 from parameters import *
 # eval const
-parameters.ccc_R0=parameters.ccc/parameters.R0
-parameters.cvr=parameters.m0/parameters.eqq
-parameters.cvr1=parameters.m01/parameters.eqq1
+parameters.ccc_R0 = ccc/parameters.R0
 
 from eqations import *
 

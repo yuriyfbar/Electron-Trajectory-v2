@@ -2,7 +2,6 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 from parameters import *
 
-
 t0U=0     #22  # ms,
 t=t0U
 t1UL=1
@@ -10,7 +9,6 @@ print('del_t=',t1UL-t0U)
 print('t=',t,'t0U=',t0U,'t1UL=',t1UL)
 t0U=t0U/tau_norm*ccc_R0
 t1UL=t1UL/tau_norm*ccc_R0
-
 
 print('after normalisation')
 print('t0U=',t0U,'t1UL=',t1UL)
