@@ -4,12 +4,12 @@ from numpy import cos,sin
 import matplotlib.pyplot as plt    
 from parameters import *
 
-df = pd.read_hdf('full_trajectory.h5', 'trajectory')
+df = pd.read_hdf('full_trajectory_1.h5', 'trajectory')
 df.head
 
 
-#ax = df.plot(x= 'rini', y='thetini', kind='line', title='My Line Plot'
-#plt.show()
+ax = df.plot(x= 'r', y='thet', kind='line', title='My Line Plot')
+plt.show()
 
 
 df['time']=df['time']/ccc_R0*tau_norm
@@ -19,7 +19,7 @@ rpr=df['r']/a
 thetpr=df['thet']
 
 mmn=0
-mmx=9999
+mmx= 10000
 mmn1=100000
 mmx1=109999
 mmn2=200000
@@ -45,10 +45,11 @@ fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
 #ax.plot(df['thetini'], df['rini']/a )
 #ax.plot(thetpr0, rpr0)
 #ax.plot(thetpr1, rpr1)
-ax.plot(thetpr3, rpr3)
-ax.plot(thetpr2, rpr2)
-ax.plot(thetpr1, rpr1)
-ax.plot(thetpr0, rpr0)
+#ax.plot(thetpr3, rpr3, alpha=0.5)
+#ax.plot(thetpr2, rpr2, alpha=0.5)
+#ax.plot(thetpr1, rpr1, alpha=0.5)
+#ax.plot(thetpr0, rpr0, alpha=0.5)
+ax.scatter(thetpr0, rpr0, alpha=0.05, color='blue', edgecolors='none', s=10)
 ax.set_rmax(1)
 #ax.set_rticks([0.2, 0.4, 0.6, 0.8])  # Less radial ticks
 ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
