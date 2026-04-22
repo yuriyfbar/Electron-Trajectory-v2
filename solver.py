@@ -1,5 +1,5 @@
 import gc
-import os
+import pandas as pd
 from config import load_configs, log_config
 from logger_config import log_memory_usage, logger
 import time
@@ -44,7 +44,6 @@ num_it=20
 nrange=10000
 delt=200000
 
-columns_list = ['ppar','r','thet','fi','pperp2','Bpol','Btot','Brad','Btor','psipol','psitor','energy','time',]
 
 # Open the HDF5 file for writing (this will overwrite the old file)
 file_name ='results/full_trajectory.h5'
@@ -93,12 +92,12 @@ with pd.HDFStore(file_name, mode='w') as store:
         thetini=thetini-int(thetini/(2*pi))*2*pi
         fiini=fiini-int(fiini/(2*pi))*2*pi
 
-        df = pd.DataFrame(all_data.T, columns=columns_list[0:-1])
+        df = pd.DataFrame(all_data.T, columns=['ppar','r','thet','fi','pperp2','Bpol','Btot','Brad','Btor','psipol','psitor','energy'])
         df['time'] =  t_steps
 
         logger.debug("\n" + df.head().to_string())
 
-        # Инкрементная запись в HDF5 (без concat и перезаписи всего файла)
+        # Инкрементная запись в HDF5 
         store.append('trajectory', df, index=False)
         del df
         del sol

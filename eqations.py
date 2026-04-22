@@ -5,16 +5,13 @@ from numba import njit
 from scipy.integrate import odeint 
 from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
-import pandas as pd
-#from mgn_best_DOP853 import saf_fact, Mag_field, fin_fun, eq_mot, rot_b, eq_mot_1
 
 from numpy import pi, sin, cos, sqrt, log, tan, atan
 
-#from field import *
-#from field_FT2 import *
 from field_EXL import *
 
 numba.config.DISABLE_JIT = False
+
 logger.info(f"Disable numba: {numba.config.DISABLE_JIT}")
 
 @njit
