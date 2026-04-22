@@ -2,15 +2,23 @@ import numpy as np
 import pandas as pd
 from numpy import cos,sin
 import matplotlib.pyplot as plt    
+from config import load_configs
 from parameters import *
+
+run_cfg = load_configs('discharges/base_shot.toml')
+
+a, R0, delr, delfi, nfi =  run_cfg
+
+# eval const
+ccc_R0=ccc/R0
+cvr=m0/eqq
+cvr1=m01/eqq1
 
 df = pd.read_hdf('full_trajectory_1.h5', 'trajectory')
 df.head
 
-
 ax = df.plot(x= 'r', y='thet', kind='line', title='My Line Plot')
 plt.show()
-
 
 df['time']=df['time']/ccc_R0*tau_norm
 print(len(df['time'])) #,'df[t_ini[0]]=',df['t_ini[0]']   #,'t_ini[len(t_ini)-1]=',t_ini[len(t_ini)-1])

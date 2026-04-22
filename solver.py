@@ -1,10 +1,23 @@
 import gc
 import os
+from config import load_configs, log_config
 from logger_config import log_memory_usage, logger
+import time
+from scipy.integrate import odeint,solve_ivp  
+
+import parameters
+run_cfg = load_configs('discharges/base_shot.toml')
+log_config(run_cfg)
+parameters.a, parameters.R0, parameters.delr, parameters.delfi, parameters.nfi =  run_cfg
+
+from parameters import *
+# eval const
+parameters.ccc_R0=ccc/R0
+parameters.cvr=m0/eqq
+parameters.cvr1=m01/eqq1
+
 from eqations import *
 
-#from parameters_FT2_r_3 import *
-from parameters import *
 t_ini=0.2*ccc_R0/tau_norm
 t0c=t_ini
 sf0=spl_q0(t0c)
@@ -28,14 +41,10 @@ logger.info(f'rini= {rini}, thetini={thetini}, fiini={fiini}, pparini= {pparini}
 #exit()
 
 num_it=20
-nrange=2000
+nrange=10000
 delt=200000
-#result_df = pd.DataFrame(columns=['pparnp', 'rnp', 'finp', 'thetnp', 'tnp1',])
-columns_list = ['ppar','r','thet','fi','pperp2','Bpol','Btot','Brad','Btor','psipol','psitor','energy','time',]
-#result_df = pd.DataFrame(columns= columns_list)
 
-import time
-from scipy.integrate import odeint,solve_ivp    
+columns_list = ['ppar','r','thet','fi','pperp2','Bpol','Btot','Brad','Btor','psipol','psitor','energy','time',]
 
 # Open the HDF5 file for writing (this will overwrite the old file)
 file_name ='full_trajectory.h5'

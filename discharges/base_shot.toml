@@ -1,0 +1,27 @@
+[tokamak]
+name = "FT2"
+R0 = 0.80          # [m] Major radius
+a  = 0.6           # [m] Minor radius
+delr  = 0.0        #
+delfi = 0.0        #
+nfi=0              #
+#b = 3.3            # [m] Vertical minor radius (for elongation)
+#wall_material = "Be"
+
+
+[discharge.main]
+shot_number = 12345
+B0 = 5.3           # [T] Toroidal field on axis
+Ip = 15.0          # [MA] Plasma current
+Uloop = 0.1        # [V] Loop voltage
+
+[discharge.perturbations]
+n = 2              # Toroidal mode number
+delfi = 0.01       # Relative amplitude
+nfi = 10           # Number of field periods
+delr = 0.05        # Radial perturbation factor
+
+# Начальные условия для солвера (профили)
+[discharge.profiles]
+sf0 = 1.0          # Safety factor on axis
+sfb = 3.5          # Safety factor at boundary
