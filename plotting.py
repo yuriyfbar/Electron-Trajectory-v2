@@ -17,11 +17,12 @@ ccc_R0= ccc/R0
 df = pd.read_hdf('results/full_trajectory_1.h5', 'trajectory')
 df.head
 
+print(f"size= {len(df)}")
+
 ax = df.plot(x= 'r', y='thet', kind='line', title='My Line Plot')
 plt.show()
 
 df['time']=df['time']/ccc_R0*tau_norm
-print(len(df['time'])) #,'df[t_ini[0]]=',df['t_ini[0]']   #,'t_ini[len(t_ini)-1]=',t_ini[len(t_ini)-1])
 
 rpr=df['r']/a
 thetpr=df['thet']
@@ -58,7 +59,7 @@ fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
 #ax.plot(thetpr1, rpr1, alpha=0.5)
 #ax.plot(thetpr0, rpr0, alpha=0.5)
 ax.scatter(thetpr0, rpr0, alpha=0.05, color='blue', edgecolors='none', s=10)
-#ax.set_rmax(1)
+ax.set_rmax(1)
 #ax.set_rticks([0.2, 0.4, 0.6, 0.8])  # Less radial ticks
 ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
 ax.grid(True)
