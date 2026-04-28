@@ -20,20 +20,24 @@ logger.info(f"Disable numba: {numba.config.DISABLE_JIT}") # type: ignore
 @njit
 def integrand(x):
     return x/sqrt(1-x**2)
+
 @njit
 def integrandn(x,n):
-    return(x**(n+1)/sqrt(1-x**2))
+    return x**(n+1)/sqrt(1-x**2)
+
 @njit
 def integrandn1(x,n):
     if abs(x)>0.002:
         y=x**n*(1.-1./sqrt(1.-x**2))
     else:
         y=-x**(n+2)*0.5*(1.+3.*x**2/4)
-    return(y)
+    return y
+
 @njit
 def E0_field(r,thet,fi,R0,Uloop):
     E0tor=Uloop/(2*pi*R0)
-    return(E0tor)
+    return E0tor
+
 @njit    
 def E_field(r,thet,fi,R0,E0tor):
     Etor=E0tor*R0/(R0+r*cos(thet))
@@ -48,17 +52,19 @@ def E_field(r,thet,fi,R0,E0tor):
         etor=0.
         erad=0.
         epol=0.
-    return(Etot,Etor,etor,Erad,erad,Epol,epol)
+    return Etot,Etor,etor,Erad,erad,Epol,epol
 
 #def Bpol_f(r,thet,sf,B0,R0):
 #    Bpol1=B0/(R0*sf)/(1+r/R0*cos(thet))
 #    Bpol=Bpol1*r
 #    return(Bpol,Bpol1)
+
 @njit
 def saf_fact(sf0,sfb,r,a,Uloop):
     sf=sf0+(sfb-sf0)*(r/a)**2
 #    sf=sf*np.sign(Uloop)
-    return(sf)
+    return sf
+
 @njit
 def fn(x,n):
     res1=0.
@@ -71,7 +77,7 @@ def fn(x,n):
         for i in range(0,10):
             res1=res1+(-1)**(n+i+2)*x**(+i)/(n+1+i)
         res1=res1*(-1)**n/(1+x)
-    return(res1)
+    return res1 
 
 @njit
 def fast_hyp_part(x, n, terms=10):
@@ -101,6 +107,7 @@ def fast_hyp_part(x, n, terms=10):
             break
             
     return (x**(n + 2)) * hyp_sum / (2.0 + n)
+
 @njit
 def fast_hyp2f1_specific(x, n, terms=15):
     """
@@ -125,6 +132,7 @@ def fast_hyp2f1_specific(x, n, terms=15):
             break
             
     return hyp_sum
+
 @njit
 def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg :RunConfig):
     #R0, a, delr, delfi, nfi, n, r, thet, fi, ppar, pperp
@@ -230,8 +238,8 @@ def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg :RunConfig):
     dBraddthet1=Gpr2*(1/R0)*Fpr+Gpr31*dFndthet
     dBraddthet=dBraddthet1*r
 
-    return(R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
-    dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1,psitor,dpsidr,dpsidfi,sf)
+    return R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
+    dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1,psitor,dpsidr,dpsidfi,sf
 ############################################################
 
 ##############
@@ -291,7 +299,7 @@ def rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBt
     bbrtt=bfi*brtr-br*brtfi
 #bbrtt1=bfi*brtr-br*brtfi
     bbrtfi=br*brtt-bpol*brtr
-    return(rtbr,rtbpol,rtbfi,brtr,brtt,brtfi,gbr,gbt,gbfi,bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi)
+    return rtbr,rtbpol,rtbfi,brtr,brtt,brtfi,gbr,gbt,gbfi,bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi
 
 def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
@@ -358,7 +366,7 @@ def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
 #        print('thet=',thet,'thet/2pi=',thet/(2*pi))
 #        print(y1,y2,y3,y4)
 #        exit()
-    return(dydt)
+    return dydt 
 
 
 def eq_mot_1(R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
@@ -400,7 +408,7 @@ def eq_mot_1(R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
 #    y10=R*R0*Etor/ccc+(y4*dpsidfi+y2*dpsidr)/(sf)
 #    y11=R*R0*Etor/ccc+(y4*dpsidfi+y2*dpsidr)
 #    dydt=[y1,y2,y3,y4,y5,y6,y7,y8,y9,y10,y11]
-    return(dRdtfi)
+    return dRdtfi
 
 #import Splines 
 
