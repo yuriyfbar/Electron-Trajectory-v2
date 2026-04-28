@@ -4,7 +4,7 @@ from numpy import cos,sin
 import matplotlib.pyplot as plt    
 from config import load_configs
 from physical_constants import *
-from parameters import *
+#from parameters import *
 
 run_cfg = load_configs('discharges/base_shot.toml')
 
@@ -12,7 +12,10 @@ run_cfg = load_configs('discharges/base_shot.toml')
 
 # eval const
 ccc_R0= ccc/run_cfg.R0
-
+ccc_R0 = ccc_R0
+a = run_cfg.a
+R0 = run_cfg.R0
+n = run_cfg.n
 
 df = pd.read_hdf('results/full_trajectory_1.h5', 'trajectory')
 df.head
