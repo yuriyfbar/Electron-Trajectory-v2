@@ -73,7 +73,7 @@ with pd.HDFStore(file_name, mode='w') as store:
         sf=saf_fact(sf0,sfb,rini,run_cfg.a,Uloop)
         logger.info(f'rini= {rini}, thetini= {thetini}, fiini= {fiini}, pparini= {pparini}')
 
-        y0= [pparini, rini, thetini, fiini, pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini]
+        y0= [pparini, rini, thetini, fiini] #, pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini]
         t_end= t_start + delt  #t1UL
         logger.info(f'rini= {rini}, thetini= {thetini}, fiini= {fiini}, pparini= {pparini}, energyini= {energyini}')
         logger.info(f't_start(s)= {t_start*run_cfg.R0/ccc*tau_norm}, del_t_calculation(s)= {(t_end-t_start)*run_cfg.R0/ccc*tau_norm}, time(s)={t_end*run_cfg.R0/ccc*tau_norm}')
@@ -96,12 +96,13 @@ with pd.HDFStore(file_name, mode='w') as store:
 
         t_start= t_steps[-1]
         y_last = all_data[:, -1]
-        pparini, rini, thetini, fiini, pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini = y_last
+        #pparini, rini, thetini, fiini , pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini = y_last
+        pparini, rini, thetini, fiini = y_last
 
         thetini=thetini-int(thetini/(2*pi))*2*pi
         fiini=fiini-int(fiini/(2*pi))*2*pi
 
-        df = pd.DataFrame(all_data.T, columns=['ppar','r','thet','fi','pperp2','Bpol','Btot','Brad','Btor','psipol','psitor','energy'])
+        df = pd.DataFrame(all_data.T, columns=['ppar','r','thet','fi'])
         df['time'] =  t_steps
 
         logger.debug("\n" + df.head().to_string())

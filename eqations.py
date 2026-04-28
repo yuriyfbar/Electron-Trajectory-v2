@@ -10,7 +10,8 @@ from scipy.integrate import odeint
 from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
 
-from numpy import pi, sin, cos, sqrt, log, tan, atan
+#from numpy import pi, sin, cos, sqrt, log, tan, atan
+from math import pi, sin, cos, sqrt, log, tan, atan
 
 from config import RunConfig
 from field_EXL import *
@@ -313,7 +314,7 @@ def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
 #    y10=(y4*dpsidfi+y2*dpsidr)/sf
     y11=(y4*dpsidfi+y2*dpsidr)
     y12=-Etor*dRdtfi
-    dydt=[y1,y2,y3,y4,y5,y6,y7,y8,y9,y10,y11,y12]
+    dydt=[y1,y2,y3,y4] #,y5,y6,y7,y8,y9,y10,y11,y12]
 #    dydt=[y1,y2,y3,y4]
 #    print(100000*R*R0*Etor/ccc,R,R0,Etor,ccc,(y4*dpsidfi+y2*dpsidr)/sf)
 #    sys.exit()
