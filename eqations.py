@@ -221,12 +221,7 @@ def rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBt
     rtbr=(dbpoldfi+bfi*sin(thet))/R-dbfidthet1
     rtbpol=(bfi*cos(thet)-dbrdfi)/R+dbfidr
     rtbfi=(dbrdthet1-bpol1)-dbpoldr
-###############################################
-    # this is wrong
-#    brtr=-(bpol*rtbfi-bfi*rtbpol)
-#    brtt=-(bfi*rtbr-br*rtbfi)
-#    brtfi=-(br*rtbpol-bpol*rtbr)
-###########################################
+
     #   this is correct
     brtr=(bpol*rtbfi-bfi*rtbpol)
     brtt=(bfi*rtbr-br*rtbfi)
@@ -254,8 +249,8 @@ def rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBt
 
 @njit
 def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
-    bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
-    dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf):
+    bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot): #,dBpoldr,dBpoldthet,dBpoldfi, \
+    # dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf):
     
     E0tor=E0_field(r,thet,fi,R0,Uloop)
     Etot,Etor,etor,Erad,erad,Epol,epol=E_field(r,thet,fi,R0,E0tor)
@@ -278,20 +273,20 @@ def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     y2=dRdtr
     y3=dRdtt/r
     y4=dRdtfi/R
-    dpperp2dt=muini*(gbr*y2+gbt*y3*r+gbfi*y4*R)
+    # dpperp2dt=muini*(gbr*y2+gbt*y3*r+gbfi*y4*R)
 
-    y5=dpperp2dt
-    dBpoldt=dBpoldr*y2+dBpoldthet*y3+dBpoldfi*y4
-    y6=dBpoldt
-    dBtotdt=gbr*y2+gbt*y3*r+gbfi*y4*R
-    y7=dBtotdt
-    dBraddt=dBraddr*y2+dBraddthet*y3+dBraddfi*y4
-    y8=dBraddt
-    dBtordt=dBtordr*y2+dBtordthet*y3+dBtordfi*y4
-    y9=dBtordt
-    y10=R*R0*Etor/ccc+(y4*dpsidfi+y2*dpsidr)/(sf*2.*pi)*np.sign(btor)
-    y11=(y4*dpsidfi+y2*dpsidr)
-    y12=-Etor*dRdtfi
+    # y5=dpperp2dt
+    # dBpoldt=dBpoldr*y2+dBpoldthet*y3+dBpoldfi*y4
+    # y6=dBpoldt
+    # dBtotdt=gbr*y2+gbt*y3*r+gbfi*y4*R
+    # y7=dBtotdt
+    # dBraddt=dBraddr*y2+dBraddthet*y3+dBraddfi*y4
+    # y8=dBraddt
+    # dBtordt=dBtordr*y2+dBtordthet*y3+dBtordfi*y4
+    # y9=dBtordt
+    # y10=R*R0*Etor/ccc+(y4*dpsidfi+y2*dpsidr)/(sf*2.*pi)*np.sign(btor)
+    # y11=(y4*dpsidfi+y2*dpsidr)
+    # y12=-Etor*dRdtfi
 
     return [y1, y2, y3, y4] #,y5,y6,y7,y8,y9,y10,y11,y12] 
 
@@ -320,8 +315,8 @@ def fin_fun(t, y, run_cfg:RunConfig, muini):
     pperp=sqrt(pperp2)
 
     dydt=eq_mot(t, run_cfg.R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
-    bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi,  \
-    dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf)
+    bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot) #,dBpoldr,dBpoldthet,dBpoldfi,  \
+    #dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf)
 
     return dydt 
 
