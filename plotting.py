@@ -56,7 +56,7 @@ fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
 #ax.plot(thetpr2, rpr2, alpha=0.5)
 #ax.plot(thetpr1, rpr1, alpha=0.5)
 #ax.plot(thetpr0, rpr0, alpha=0.5)
-ax.scatter(thetpr0, rpr0, alpha=0.05, color='blue', edgecolors='none', s=10)
+ax.scatter(thetpr, rpr, alpha=0.05, color='blue', edgecolors='none', s=10)
 ax.set_rmax(1)
 #ax.set_rticks([0.2, 0.4, 0.6, 0.8])  # Less radial ticks
 ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
