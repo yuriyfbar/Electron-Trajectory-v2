@@ -197,14 +197,8 @@ def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg :RunConfig):
 
     return R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
     dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1,psitor,dpsidr,dpsidfi,sf
-############################################################
 
-##############
-#   dbrdthet=(dBraddthet-Brad*(Brad*dBraddthet+Bpol*dBpoldthet+Btor*dBtordthet)/Btot**2)/Btot
-#   dbpoldr=(dBpoldr-Bpol*(Brad*dBraddr+Bpol*dBpoldr+Btor*dBtordr)/Btot**2)/Btot
-#   rtbfi=(dbrdthet-bpol)/r-dbpoldr                                         
-#   dbfidthet=(dBtordthet-Btor*(Brad*dBraddthet+Bpol*dBpoldthet+Btor*dBtordthet)/Btot**2)/Btot  
-
+@njit
 def rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
     dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1):
     br=brad
@@ -258,6 +252,7 @@ def rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBt
     bbrtfi=br*brtt-bpol*brtr
     return rtbr,rtbpol,rtbfi,brtr,brtt,brtfi,gbr,gbt,gbfi,bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi
 
+@njit
 def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
     dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf):
@@ -300,49 +295,6 @@ def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
 
     return [y1, y2, y3, y4] #,y5,y6,y7,y8,y9,y10,y11,y12] 
 
-
-def eq_mot_1(R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
-    bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
-    dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor):
-    E0tor=E0_field(r,thet,fi,R0,Uloop)
-    Etot,Etor,etor,Erad,erad,Epol,epol=E_field(r,thet,fi,R0,E0tor)
-    ptot2=pperp**2+ppar**2
-    gam=sqrt(1.+ptot2)
-
-
-#    dppardt=eqq*R0/(m0*ccc**2)*(Erad*brad+Epol*bpol+Etor*btor)-R0*pperp**2/(2*Btot*gam)* \
-#    (gbr*brad+gbt*bpol+gbfi*btor)
-
-    omce=eqq*Btot/(m0*ccc)
-    M1=ppar*R0/gam
-    M2=0.5*R0/(omce*gam)*pperp**2
-#    M2=2*R0/(omce*gam)*pperp**2
-    M3=R0/(omce*gam)*ppar**2
-    M4=R0/(ccc*Btot)
-
-#    dRdtr=M1*brad+M2*bgrr+M3*bbrtr+M4*(Epol*btor-Etor*bpol)
-#    dRdtt=M1*bpol+M2*bgrt+M3*bbrtt+M4*(Etor*brad-Erad*btor)
-    dRdtfi=M1*btor+M2*bgrfi+M3*bbrtfi+M4*(Erad*bpol-Epol*brad)
-#    y1=dppardt
-#    y2=dRdtr
-#    y3=dRdtt/r
-#    y4=dRdtfi/R
-#    dpperp2dt=muini*(gbr*y2+gbt*y3*r+gbfi*y4*R)
-#    y5=dpperp2dt
-#    dBpoldt=dBpoldr*y2+dBpoldthet*y3+dBpoldfi*y4
-#    y6=dBpoldt
-#    dBtotdt=gbr*y2+gbt*y3*r+gbfi*y4*R
-#    y7=dBtotdt
-#    dBraddt=dBraddr*y2+dBraddthet*y3+dBraddfi*y4
-#    y8=dBraddt
-#    dBtordt=dBtordr*y2+dBtordthet*y3+dBtordfi*y4
-#    y9=dBtordt
-#    y10=R*R0*Etor/ccc+(y4*dpsidfi+y2*dpsidr)/(sf)
-#    y11=R*R0*Etor/ccc+(y4*dpsidfi+y2*dpsidr)
-#    dydt=[y1,y2,y3,y4,y5,y6,y7,y8,y9,y10,y11]
-    return dRdtfi
-
-#import Splines 
 
 def fin_fun(t, y, run_cfg:RunConfig, muini):
     #a,R0,delr,delfi,nfi,n,pparini,pperpini
