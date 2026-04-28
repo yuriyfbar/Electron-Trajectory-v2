@@ -1,5 +1,5 @@
 
-#n=0 # power            in dependence of toroidal field ripple on (r/a)**n 
+n=0 # power            in dependence of toroidal field ripple on (r/a)**n 
 # solver config
 #pparini=-0.1
 #pperpini=0.025

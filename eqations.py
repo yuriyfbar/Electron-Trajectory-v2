@@ -3,6 +3,9 @@ from loguru import logger
 import numpy as np
 import numba 
 from numba import njit
+numba.config.DISABLE_JIT = False # type: ignore
+from hyp2f import create_fast_hyp, create_pade_hyp, fast_hyp2f1_specific, fast_hyp_part
+
 from scipy.integrate import odeint 
 from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
@@ -13,8 +16,7 @@ from config import RunConfig
 from field_EXL import *
 
 from physical_constants import eqq, ccc, m0
-
-numba.config.DISABLE_JIT = False # type: ignore
+from parameters import n
 
 logger.info(f"Disable numba: {numba.config.DISABLE_JIT}") # type: ignore
 
@@ -80,60 +82,9 @@ def fn(x,n):
         res1=res1*(-1)**n/(1+x)
     return res1 
 
-@njit
-def fast_hyp_part(x, n, terms=10):
-    """
-    Аппроксимация hyp2f1(0.5, (2+n)/2, (4+n)/2, x^2) / (2+n)
-    через степенной ряд.
-    """
-    x2 = x**2
-    a = 0.5
-    b = (2.0 + n) / 2.0
-    c = (4.0 + n) / 2.0
-    
-    # Первый член ряда (k=0) всегда 1
-    hyp_sum = 1.0
-    current_term = 1.0
-    
-    # Итерируемся для точности (10-15 итераций обычно за глаза при x < 0.9)
-    for k in range(1, terms):
-        # Рекуррентное отношение для следующего члена ряда
-        # (a+k-1)*(b+k-1) / ((c+k-1)*k) * z
-        multiplier = ((a + k - 1) * (b + k - 1)) / ((c + k - 1) * k) * x2
-        current_term *= multiplier
-        hyp_sum += current_term
-        
-        # Если член ряда стал ничтожно мал, выходим раньше
-        if abs(current_term) < 1e-12:
-            break
-            
-    return hyp_sum
 
-@njit
-def fast_hyp2f1_specific(x, n, terms=15):
-    """
-    Аппроксимация hyp2f1(0.5, (1+n)/2, (3+n)/2, x^2)
-    через рекуррентный расчет степенного ряда.
-    """
-    x2 = x**2
-    a = 0.5
-    b = (1.0 + n) / 2.0
-    c = (3.0 + n) / 2.0
-    
-    hyp_sum = 1.0
-    current_term = 1.0
-    
-    for k in range(1, terms):
-        # Формула: term_{k} = term_{k-1} * (a+k-1)*(b+k-1) / ((c+k-1)*k) * z
-        multiplier = ((a + k - 1) * (b + k - 1)) / ((c + k - 1) * k) * x2
-        current_term *= multiplier
-        hyp_sum += current_term
-        
-        if abs(current_term) < 1e-14:
-            break
-            
-    return hyp_sum
-
+hyp_fast = create_fast_hyp(a = 0.5, b = (2.0 + n) / 2.0, c = (4.0 + n) / 2.0)
+hyp_fast = create_pade_hyp(a = 0.5, b = (2.0 + n) / 2.0, c = (4.0 + n) / 2.0)
 #@profile
 @njit
 def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg :RunConfig):
@@ -176,11 +127,14 @@ def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg :RunConfig):
 
     A1=psi0*res
 
-    resn=x**(n+2)*fast_hyp_part(x, n)/(2+n)
+    #resn=x**(n+2)*fast_hyp_part(x, n)/(2+n)
+    resn=x**(n+2)*hyp_fast(x)/(2+n)
 
     An=psi0n*resn
 
     resn1=-x**(1+n)*(-1.+fast_hyp2f1_specific(x,n))/(1+n)
+    #resn1=-x**(1+n)*(-1.+hyp_fast(x))/(1+n)
+    
     An1=psi0n*resn1
 
     psitor=A1+(An+delr*An1)*delfi*cos(nfi*fi)

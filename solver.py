@@ -18,6 +18,7 @@ ccc_R0 = ccc/run_cfg.R0
 parameters.ccc_R0 = ccc_R0
 parameters.a = run_cfg.a
 parameters.R0 = run_cfg.R0
+parameters.n = run_cfg.n
 from eqations import *
 
 t_ini=0.2*ccc_R0/tau_norm
@@ -57,7 +58,7 @@ with pd.HDFStore(file_name, mode='w') as store:
     thetini = run_cfg.thet
     fiini = run_cfg.fi
     pparini = run_cfg.ppar
-    
+
     for it in range(num_it):
         logger.info(f"Iteration {it}. Start")
         log_memory_usage()
