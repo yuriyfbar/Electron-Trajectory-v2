@@ -10,6 +10,8 @@ from numpy import pi, sin, cos, sqrt, log, tan, atan
 
 from field_EXL import *
 
+from physical_constants import eqq, ccc
+
 numba.config.DISABLE_JIT = False # type: ignore
 
 logger.info(f"Disable numba: {numba.config.DISABLE_JIT}") # type: ignore
@@ -288,7 +290,7 @@ def rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBt
     bbrtfi=br*brtt-bpol*brtr
     return(rtbr,rtbpol,rtbfi,brtr,brtt,brtfi,gbr,gbt,gbfi,bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi)
 
-def eq_mot(t,eqq,ccc,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
+def eq_mot(t,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
     dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf):
     
@@ -356,7 +358,7 @@ def eq_mot(t,eqq,ccc,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,
     return(dydt)
 
 
-def eq_mot_1(eqq,ccc,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
+def eq_mot_1(m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
     dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor):
     E0tor=E0_field(r,thet,fi,R0,Uloop)
@@ -399,7 +401,7 @@ def eq_mot_1(eqq,ccc,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,
 
 #import Splines 
 
-def fin_fun(t,y,eqq,m0,ccc,a,R0,delr,delfi,nfi,n,pparini,pperpini,muini):
+def fin_fun(t,y,m0,a,R0,delr,delfi,nfi,n,pparini,pperpini,muini):
     ppar=y[0]
     r=y[1]
     thet=y[2]
@@ -428,7 +430,7 @@ def fin_fun(t,y,eqq,m0,ccc,a,R0,delr,delfi,nfi,n,pparini,pperpini,muini):
     dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1)
     pperp2=muini*Btot
     pperp=sqrt(pperp2)
-    dydt=eq_mot(t,eqq,ccc,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
+    dydt=eq_mot(t,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi,  \
     dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf)
     return(dydt)

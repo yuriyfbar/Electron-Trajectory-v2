@@ -74,7 +74,7 @@ with pd.HDFStore(file_name, mode='w') as store:
                     y0, 
                     method='DOP853', 
                     dense_output=True, 
-                    args=(eqq, m0, ccc, a, R0, delr, delfi, nfi, n, pparini, pperpini, muini),
+                    args=( m0, a, R0, delr, delfi, nfi, n, pparini, pperpini, muini),
                     rtol= 1e-7,
                     atol= 1e-10) 
         logger.info(f"Number of function evaluations {sol.nfev}")
