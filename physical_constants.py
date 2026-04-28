@@ -10,5 +10,7 @@ m0 = 9.1094e-31    # electron mass, kg
 eqq = -1.602e-19   # electron charge, coulomb
 ccc = 3.0e8        # speed of light, m/s
 
+tau_norm = 1
+
 cvr = m0/eqq
 cvr1 = m01/eqq1

@@ -8,10 +8,10 @@ from parameters import *
 
 run_cfg = load_configs('discharges/base_shot.toml')
 
-a, R0, delr, delfi, nfi =  run_cfg
+#a, R0, delr, delfi, nfi =  run_cfg
 
 # eval const
-ccc_R0= ccc/R0
+ccc_R0= ccc/run_cfg.R0
 
 
 df = pd.read_hdf('results/full_trajectory_1.h5', 'trajectory')

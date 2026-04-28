@@ -2,12 +2,17 @@
 name = "FT2"
 R0 = 0.80          # [m] Major radius
 a  = 0.6           # [m] Minor radius
-delr  = 0.0        #
-delfi = 0.0        #
-nfi=0              #
 # параметры выше уже используються
 #b = 3.3           # [m] Vertical minor radius (for elongation)
 #wall_material = "Be"
+
+[initial_conditions]
+ppar = -0.1
+pperp = 0.025
+r = 0.2
+thet = 0
+fi = 0
+
 
 # тут можно придумывать все что угодно
 [discharge.main]
@@ -17,10 +22,10 @@ Ip = 15.0          # [MA] Plasma current
 Uloop = 0.1        # [V] Loop voltage
 
 [discharge.perturbations]
-n = 2              # Toroidal mode number
-delfi = 0.01       # Relative amplitude
-nfi = 10           # Number of field periods
-delr = 0.05        # Radial perturbation factor
+n = 0              # Toroidal mode number
+delfi = 0.0       # Relative amplitude
+nfi = 0           # Number of field periods
+delr = 0.0        # Radial perturbation factor
 
 # Начальные условия для солвера (профили)
 [discharge.profiles]

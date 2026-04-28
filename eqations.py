@@ -8,9 +8,10 @@ from scipy.interpolate import CubicSpline
 
 from numpy import pi, sin, cos, sqrt, log, tan, atan
 
+from config import RunConfig
 from field_EXL import *
 
-from physical_constants import eqq, ccc
+from physical_constants import eqq, ccc, m0
 
 numba.config.DISABLE_JIT = False # type: ignore
 
@@ -125,7 +126,9 @@ def fast_hyp2f1_specific(x, n, terms=15):
             
     return hyp_sum
 @njit
-def Mag_field(r,thet,fi,R0,a,B0,delfi,nfi,delr,n,sf0,sfb,Uloop):
+def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg :RunConfig):
+    #R0, a, delr, delfi, nfi, n, r, thet, fi, ppar, pperp
+    R0, a, delr, delfi, nfi, n, _, _, _, _, _ = run_cfg
     x=r/R0
     R=R0+r*cos(thet)
     xpr=r*cos(thet)/R0
@@ -290,7 +293,7 @@ def rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBt
     bbrtfi=br*brtt-bpol*brtr
     return(rtbr,rtbpol,rtbfi,brtr,brtt,brtfi,gbr,gbt,gbfi,bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi)
 
-def eq_mot(t,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
+def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
     dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf):
     
@@ -358,7 +361,7 @@ def eq_mot(t,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     return(dydt)
 
 
-def eq_mot_1(m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
+def eq_mot_1(R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi, \
     dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor):
     E0tor=E0_field(r,thet,fi,R0,Uloop)
@@ -401,7 +404,8 @@ def eq_mot_1(m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
 
 #import Splines 
 
-def fin_fun(t,y,m0,a,R0,delr,delfi,nfi,n,pparini,pperpini,muini):
+def fin_fun(t, y, run_cfg:RunConfig, muini):
+    #a,R0,delr,delfi,nfi,n,pparini,pperpini
     ppar=y[0]
     r=y[1]
     thet=y[2]
@@ -417,20 +421,21 @@ def fin_fun(t,y,m0,a,R0,delr,delfi,nfi,n,pparini,pperpini,muini):
 #    sfb=Splines.spl_qa(t)
     Uloop=spl_U(t)
     B0=spl_B(t)
-    sf=saf_fact(sf0,sfb,r,a,Uloop)
+    sf=saf_fact(sf0,sfb,r,run_cfg.a,Uloop)
 #    Bpol,Bpol1=Bpol_f(r,thet,sf,B0,R0)
 #    E0tor=E0_field(r,thet,fi,R0,Uloop)
 #    Etot,Etor,etor,Erad,erad,Epol,epol=E_field(r,thet,fi,R0,E0tor)
     R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
     dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1,psitor,dpsidr,dpsidfi,sf \
-    =Mag_field(r,thet,fi,R0,a,B0,delfi,nfi,delr,n,sf0,sfb,Uloop)
+    =Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg)
+
     rtbr,rtbpol,rtbfi,brtr,brtt,brtfi,gbr,gbt,gbfi,bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi  \
     =rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,   \
     dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
     dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1)
     pperp2=muini*Btot
     pperp=sqrt(pperp2)
-    dydt=eq_mot(t,m0,R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
+    dydt=eq_mot(t, run_cfg.R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot,dBpoldr,dBpoldthet,dBpoldfi,  \
     dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf)
     return(dydt)

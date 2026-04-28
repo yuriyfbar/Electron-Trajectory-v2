@@ -8,7 +8,13 @@ class RunConfig(NamedTuple):
     delr: float
     delfi: float
     nfi: int
- 
+    n: int
+    r: float
+    thet: float
+    fi: float
+    ppar: float
+    pperp: float
+
 def load_configs(discharge_path):
     with open(discharge_path, "rb") as f:
         cfg = tomllib.load(f)
@@ -16,11 +22,17 @@ def load_configs(discharge_path):
     logger.info(f"Tokamak: {cfg['tokamak']['name']}")
 
     return RunConfig(
-        R0= cfg['tokamak']['R0'],
-        a= cfg['tokamak']['a'],
-        delr= cfg['tokamak']['delr'],
-        delfi= cfg['tokamak']['delfi'],
-        nfi=cfg['tokamak']['nfi']
+        R0=    cfg['tokamak']['R0'],
+        a=     cfg['tokamak']['a'],
+        delr=  cfg['discharge']['perturbations']['delr'],
+        delfi= cfg['discharge']['perturbations']['delfi'],
+        nfi=   cfg['discharge']['perturbations']['nfi'],
+        n=     cfg['discharge']['perturbations']['n'],
+        r=     cfg['initial_conditions']['r'],
+        thet=  cfg['initial_conditions']['thet'],
+        fi=    cfg['initial_conditions']['fi'],
+        ppar=  cfg['initial_conditions']['ppar'],
+        pperp= cfg['initial_conditions']['pperp'],
     )
 
 def log_config(cfg):

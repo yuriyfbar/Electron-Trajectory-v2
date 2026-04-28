@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.interpolate import CubicSpline
-from parameters import *
-
+from parameters import ccc_R0, a, R0
+from physical_constants import tau_norm
 t0U=0     #22  # ms,
 t=t0U
 t1UL=1
