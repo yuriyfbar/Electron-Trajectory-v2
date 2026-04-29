@@ -1,5 +1,5 @@
 [tokamak]
-name = "EXL 50U"
+name = "EXL-50U"
 R0 = 0.80          # [m] Major radius
 a  = 0.6           # [m] Minor radius
 # параметры выше уже используються
