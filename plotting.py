@@ -19,8 +19,12 @@ df.head
 
 print(f"size= {len(df)}")
 
+plt.ion() # Включаем интерактивный режим
+
+plt.figure()
 ax = df.plot(x= 'r', y='thet', kind='line', title='My Line Plot')
-plt.show()
+plt.draw() # Принудительная отрисовка
+plt.pause(0.1)
 
 df['time']=df['tau']/ccc_R0*tau_norm
 
@@ -64,8 +68,9 @@ ax.set_rmax(1)
 ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
 ax.grid(True)
 #ax.set_title("Electron trajectory in poloidal crossection", va='bottom')
-plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.1_segment_4_cross_sect.svg')
-plt.show()
+plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.1_segment_4_cross_sect.png')
+plt.draw() # Принудительная отрисовка
+plt.pause(0.1)
 
 #print('rini=',sol[nrange-1,1])
 #plt.plot(sol.t, sol.y[1]/a, 'g', label='r(t)/a')
@@ -78,6 +83,7 @@ tinipr1=tinipr[mmn1:mmx1]
 tinipr2=tinipr[mmn2:mmx2]
 tinipr3=tinipr[mmn3:mmx3]
 #plt.plot(df['t_ini'], df['rini']/a, 'g', label='r(t)/a')
+plt.figure()
 plt.plot(tinipr,rpr, 'm', label='r(t)/a')
 plt.plot(tinipr0,rpr0, 'r', label='r(t)/a')
 plt.plot(tinipr1,rpr1, 'g', label='r(t)/a')
@@ -92,10 +98,12 @@ plt.ylim(0.,1.0)
 #plt.xlim(0.328,0.331)
 plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_rto_a.svg')
 plt.grid()
-plt.show()
+plt.draw() # Принудительная отрисовка
+plt.pause(0.1)
 #print('final t(ms)=',tinipr[mmx-1:mmx])
 #print('final tinipr[mmx]=')
 
+plt.figure()
 #print('r[nrange-1]=',sol[nrange-1,1])
 #plt.plot(sol.t, sol.y[1], 'g', label='r(t)')
 plt.plot(df['time'], df['r'], 'g', label='r(t)')
@@ -110,7 +118,12 @@ plt.ylim(0.0,0.601)
 #plt.xlim(46.9,46.95)
 #plt.xlim(0.52,0.53)
 plt.grid()
-plt.show()
+plt.figure()
+plt.draw() # Принудительная отрисовка
+plt.pause(0.1)
+
+plt.ioff() # Выключаем интерактивный режим
+plt.show() # Блокируем выход, пока вы сами не закроете окна
 
 #plt.plot(sol.t, m01*ccc1**2*(sqrt(1+(sol.y[4])+(sol.y[0])**2)-1.)/1.6022e-12, 'r', label='energy(eV)')
 #df['energy']= m01*ccc1**2*(np.sqrt(1+df['pperp2']+(df['ppar'])**2)-1.)/1.6022e-12
