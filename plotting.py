@@ -7,12 +7,13 @@ from physical_constants import *
 
 run_cfg = load_configs('discharges/base_shot.toml')
 
-ccc_R0= ccc/run_cfg.R0
-a = run_cfg.a
-R0 = run_cfg.R0
-n = run_cfg.n
+params = run_cfg.params
+ccc_R0= ccc/params.R0
+a = params.a
+R0 = params.R0
+n = params.n
 
-df = pd.read_hdf('results/full_trajectory_1.h5', 'trajectory')
+df = pd.read_hdf('results/full_trajectory.h5', 'trajectory')
 df.head
 
 print(f"size= {len(df)}")

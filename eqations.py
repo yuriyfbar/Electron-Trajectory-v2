@@ -13,7 +13,7 @@ from scipy.interpolate import CubicSpline
 #from numpy import pi, sin, cos, sqrt, log, tan, atan
 from math import pi, sin, cos, sqrt, log, tan, atan
 
-from config import RunConfig
+from config import RunConfig, RunParams
 from field_EXL import *
 
 from physical_constants import eqq, ccc, m0
@@ -88,9 +88,9 @@ hyp_fast = create_fast_hyp(a = 0.5, b = (2.0 + n) / 2.0, c = (4.0 + n) / 2.0)
 hyp_fast = create_pade_hyp(a = 0.5, b = (2.0 + n) / 2.0, c = (4.0 + n) / 2.0)
 #@profile
 @njit
-def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg :RunConfig):
+def Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, params :RunParams):
     #R0, a, delr, delfi, nfi, n, r, thet, fi, ppar, pperp
-    R0, a, delr, delfi, nfi, n, _, _, _, _, _ = run_cfg
+    R0, a, delr, delfi, nfi, n, _, _, _, _, _ = params
     x=r/R0
     R=R0+r*cos(thet)
     xpr=r*cos(thet)/R0
@@ -291,7 +291,7 @@ def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     return [y1, y2, y3, y4] #,y5,y6,y7,y8,y9,y10,y11,y12] 
 
 
-def fin_fun(t, y, run_cfg:RunConfig, muini):
+def fin_fun(t, y, params:RunParams, muini):
     #a,R0,delr,delfi,nfi,n,pparini,pperpini
     ppar, r, thet, fi = y
     
@@ -300,11 +300,11 @@ def fin_fun(t, y, run_cfg:RunConfig, muini):
 #    sfb=Splines.spl_qa(t)
     Uloop=spl_U(t)
     B0=spl_B(t)
-    sf=saf_fact(sf0,sfb,r,run_cfg.a,Uloop)
+    sf=saf_fact(sf0,sfb,r,params.a,Uloop)
 
     R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,dBtordfi,dBraddr,dBtordr,dBpoldfi,dBraddfi,  \
     dBpoldthet,dBtordthet,dBraddthet,dBpoldthet1,dBtordthet1,dBraddthet1,psitor,dpsidr,dpsidfi,sf \
-    =Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, run_cfg)
+    =Mag_field(r, thet, fi, B0, sf0, sfb, Uloop, params)
 
     rtbr,rtbpol,rtbfi,brtr,brtt,brtfi,gbr,gbt,gbfi,bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi  \
     =rot_b(r,thet,fi,R,Btot,Btor,Bpol,Bpol1,Brad,brad,btor,bpol,bpol1,dBpoldr,   \
@@ -314,7 +314,7 @@ def fin_fun(t, y, run_cfg:RunConfig, muini):
     pperp2=muini*Btot
     pperp=sqrt(pperp2)
 
-    dydt=eq_mot(t, run_cfg.R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
+    dydt=eq_mot(t, params.R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     bgrr,bgrt,bgrfi,bbrtr,bbrtt,bbrtfi,brad,btor,bpol,muini,Btot) #,dBpoldr,dBpoldthet,dBpoldfi,  \
     #dBraddr,dBraddthet,dBraddfi,dBtordr,dBtordthet,dBtordfi,Bpol,Brad,Btor,psitor,dpsidr,dpsidfi,sf)
 

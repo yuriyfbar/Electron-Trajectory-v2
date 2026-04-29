@@ -1,7 +1,8 @@
 import tomllib
 from typing import NamedTuple
 
-class RunConfig(NamedTuple):
+
+class RunParams(NamedTuple):
     R0: float
     a: float
     delr: float
@@ -14,16 +15,22 @@ class RunConfig(NamedTuple):
     ppar: float
     pperp: float
 
+class RunConfig(NamedTuple):
+    tokamak_name: str
+    shot_number: int
+    time_start: float # [sec]
+    num_it: int
+    nrange: int
+    delta_tau: float
+    params: RunParams
 
-def get_tokamak(discharge_path):
-    with open(discharge_path, "rb") as f:
-        cfg = tomllib.load(f)
-    return f"Tokamak: {cfg['tokamak']['name']}"
+
+
 
 def load_configs(discharge_path):
     with open(discharge_path, "rb") as f:
         cfg = tomllib.load(f)
-    return RunConfig(
+    params = RunParams(
         R0=    cfg['tokamak']['R0'],
         a=     cfg['tokamak']['a'],
         delr=  cfg['discharge']['perturbations']['delr'],
@@ -36,10 +43,19 @@ def load_configs(discharge_path):
         ppar=  cfg['initial_conditions']['ppar'],
         pperp= cfg['initial_conditions']['pperp'],
     )
+    return RunConfig(
+        tokamak_name = cfg['tokamak']['name'],
+        shot_number = cfg['discharge']['main']['shot_number'],
+        time_start=  cfg['initial_conditions']['time_start'],
+        num_it=      cfg['initial_conditions']['num_it'],
+        nrange=      cfg['initial_conditions']['nrange'],
+        delta_tau=   cfg['initial_conditions']['delta_tau'],
+        params= params
+    )
 
-def info_string(cfg):
-    info = f"R0 = {cfg.R0}, a = {cfg.a}, "
-    info += f"delr = {cfg.delr}, delr = {cfg.delr}, "
-    info += f"nfi = {cfg.nfi}"
+def param_string(p:RunParams):
+    info = f"R0 = {p.R0}, a = {p.a}, "
+    info += f"delr = {p.delr}, delr = {p.delr}, "
+    info += f"nfi = {p.nfi}"
     return info
 
