@@ -96,11 +96,12 @@ with pd.HDFStore(file_name, mode='w') as store:
         iteration_time = time.time() - iteration_start_time
         logger.info(f"Number of function evaluations per sec {(sol.nfev/iteration_time):0.2f}")
 
-        t_steps = np.linspace(tau_start, tau_end, run_cfg.nrange)
-        all_data = sol.sol(t_steps) # Получаем все данные разом!
-
-        tau_start= t_steps[-1]
-        y_last = all_data[:, -1]
+        #t_steps = np.linspace(tau_start, tau_end, run_cfg.nrange)
+        #all_data = sol.sol(t_steps) # Получаем все данные разом!
+        #tau_start= t_steps[-1]
+        #y_last = all_data[:, -1]
+        tau_start= sol.t[-1]
+        y_last = sol.y[:, -1]
         #pparini, rini, thetini, fiini , pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini = y_last
         pparini, rini, thetini, fiini = y_last
 
@@ -110,8 +111,8 @@ with pd.HDFStore(file_name, mode='w') as store:
         thetini=thetini-int(theta_revolutions)*2*pi
         fiini=fiini-int(fi_revolutions)*2*pi
         
-        df = pd.DataFrame(all_data.T, columns=['ppar','r','thet','fi'])
-        df['tau'] =  t_steps
+        df = pd.DataFrame(sol.y.T, columns=['ppar','r','thet','fi'])
+        df['tau'] =  sol.t
 
         logger.debug("\n" + df.head().to_string())
         logger.info(f"df size= {len(df)}")
@@ -122,10 +123,17 @@ with pd.HDFStore(file_name, mode='w') as store:
         
         if sol.status == 1:
             logger.info(f"Событие зафиксировано: частица коснулась стенки.")
-
+            tau_collision = sol.t_events[0][0]
+            logger.info(f"tau collision = {tau_collision:.2e} сек.")
+            
+            # Можно также узнать координаты точки столкновения
+            #R_collision = sol.y_events[0][0][0]
+            #Z_collision = sol.y_events[0][0][2]
+            #print(f"Координаты столкновения: R={R_collision:.3f}, Z={Z_collision:.3f}")
+            break
         del df
         del sol
-        del all_data
+        #del all_data
         gc.collect()
 
 
