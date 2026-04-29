@@ -21,6 +21,7 @@ run_cfg = config.load_configs(f'discharges/{shot_file}')
 logger.info(f"Tokamak: {run_cfg.tokamak_name} Shot number: {run_cfg.shot_number}")
 logger.info(config.param_string(run_cfg.params))
 
+result_file = f"{run_cfg.tokamak_name}_{run_cfg.shot_number}.h5"
 # eval const
 params = run_cfg.params
 ccc_R0 = ccc/params.R0
@@ -55,7 +56,7 @@ logger.info(f'rini= {params.r}, thetini={params.thet}, fiini={params.fi}, pparin
 logger.info(f"------------------------------------------------------------")
 # Open the HDF5 file for writing (this will overwrite the old file)
 calculation_start_time = time.time()
-file_name ='results/full_trajectory.h5'
+file_name = f'results/{result_file}'
 with pd.HDFStore(file_name, mode='w') as store:
     logger.info(f"Open the HDF5 file :  {file_name}")
     tau_start = t_ini
