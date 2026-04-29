@@ -1,4 +1,5 @@
 import gc
+import sys
 import pandas as pd
 import config 
 from logger_config import log_memory_usage, logger
@@ -7,9 +8,15 @@ from scipy.integrate import odeint,solve_ivp
 
 from physical_constants import *
 import parameters
-        
 
-run_cfg = config.load_configs('discharges/base_shot.toml')
+if len(sys.argv) > 1:
+    shot_file=sys.argv[1]
+else:
+    shot_file = 'base_shot.toml'
+
+logger.info(f"shot file: {shot_file}")
+    
+run_cfg = config.load_configs(f'discharges/{shot_file}')
 
 logger.info(f"Tokamak: {run_cfg.tokamak_name} Shot number: {run_cfg.shot_number}")
 logger.info(config.param_string(run_cfg.params))
