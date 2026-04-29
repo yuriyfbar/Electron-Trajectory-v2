@@ -1,3 +1,4 @@
+from cmath import pi
 import sys
 
 import numpy as np
@@ -17,21 +18,65 @@ R0 = params.R0
 n = params.n
 
 df = pd.read_hdf('results/EXL-50U_13976.h5', 'trajectory')
-print(df.head().to_string())
 
-print(f"size= {len(df)}")
 
 df['R'] = R0+ df['r']*cos(df['theta'])
 df['Z'] = df['r']*sin(df['theta'])
 df['time']=df['tau']/ccc_R0*tau_norm
+df['floor_phi'] =  np.floor(df['phi']/(2*pi)).astype(int)
 
+# Оставляем только те строки, где текущее значение не равно предыдущему
+df_Poincare  = df[df['floor_phi'] != df['floor_phi'].shift()]
+
+print(df.head(20).to_string())
+print(f"size= {len(df)}")
+
+print(df_Poincare.head(20).to_string())
+print(f"size= {len(df_Poincare)}")
 plt.ion() # Включаем интерактивный режим
 
 #plt.figure()
-ax = df.plot(x= 'R', y='Z', kind='scatter', title='Scatter plot')
+ax = df_Poincare.plot(x= 'R', y='Z', alpha=0.05, edgecolors='none', s=10, kind='scatter', title='Scatter plot')
 ax.axis('equal')
 plt.draw() # Принудительная отрисовка
 plt.pause(0.1)
+
+fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+ax.scatter( df['theta'], df['r']/a, alpha=0.05, color='blue', edgecolors='none', s=10)
+ax.set_rmax(1)
+#ax.set_rticks([0.2, 0.4, 0.6, 0.8])  # Less radial ticks
+ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
+ax.grid(True)
+#ax.set_title("Electron trajectory in poloidal crossection", va='bottom')
+#plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.1_segment_4_cross_sect.png')
+
+plt.draw() 
+plt.pause(0.1)
+
+
+plt.figure()
+plt.plot(df['time'], df['r']/a, 'b')
+plt.title("r(t)/a plot")
+plt.xlabel('t(ms)')
+plt.ylim(0.,1.0)
+#plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_rto_a.svg')
+plt.grid()
+plt.draw() 
+plt.pause(0.1)
+
+plt.figure()
+plt.plot(df['time'], df['phi'], 'b')
+plt.title("phi(t) plot")
+plt.xlabel('t(ms)')
+#plt.ylim(0.,1.0)
+#plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_rto_a.svg')
+plt.grid()
+plt.draw() 
+
+plt.pause(0.1)
+
+plt.ioff() # Выключаем интерактивный режим
+plt.show() # Блокируем выход, пока вы сами не закроете окна
 
 
 
@@ -62,26 +107,7 @@ thetpr3=thetpr[mmn3:mmx3]
 #tpr=df['t_ini']
 #tpr=tpr[0:45]
 
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-#ax.plot(df['thetini'], df['rini']/a )
-#ax.plot(thetpr0, rpr0)
-#ax.plot(thetpr1, rpr1)
-#ax.plot(thetpr3, rpr3, alpha=0.5)
-#ax.plot(thetpr2, rpr2, alpha=0.5)
-#ax.plot(thetpr1, rpr1, alpha=0.5)
-#ax.plot(thetpr0, rpr0, alpha=0.5)
-ax.scatter(thetpr, rpr, alpha=0.05, color='blue', edgecolors='none', s=10)
-ax.set_rmax(1)
-#ax.set_rticks([0.2, 0.4, 0.6, 0.8])  # Less radial ticks
-ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
-ax.grid(True)
-#ax.set_title("Electron trajectory in poloidal crossection", va='bottom')
-plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.1_segment_4_cross_sect.png')
-plt.draw() # Принудительная отрисовка
-plt.pause(0.1)
 
-plt.ioff() # Выключаем интерактивный режим
-plt.show() # Блокируем выход, пока вы сами не закроете окна
 
 sys.exit(0)
 #print('rini=',sol[nrange-1,1])
