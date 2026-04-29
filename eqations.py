@@ -84,7 +84,7 @@ def fn(x,n):
     return res1 
 
 
-hyp_fast = create_fast_hyp(a = 0.5, b = (2.0 + n) / 2.0, c = (4.0 + n) / 2.0)
+#hyp_fast = create_fast_hyp(a = 0.5, b = (2.0 + n) / 2.0, c = (4.0 + n) / 2.0)
 hyp_fast = create_pade_hyp(a = 0.5, b = (2.0 + n) / 2.0, c = (4.0 + n) / 2.0)
 #@profile
 @njit
