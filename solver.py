@@ -2,7 +2,7 @@ import gc
 import sys
 import pandas as pd
 import config 
-from logger_config import log_memory_usage, logger
+from logger_config import get_memory_usage, logger
 import time
 from scipy.integrate import odeint,solve_ivp  
 
@@ -67,7 +67,6 @@ with pd.HDFStore(file_name, mode='w') as store:
     logger.info(f"num_it= {run_cfg.num_it}, nrange= {run_cfg.nrange}")
     for it in range(run_cfg.num_it):
         logger.info(f"Iteration {it}. Start")
-        log_memory_usage()
         iteration_start_time = time.time()
         t0c=tau_start
         sf0=spl_q0(t0c)
@@ -80,7 +79,7 @@ with pd.HDFStore(file_name, mode='w') as store:
         y0= [pparini, rini, thetini, fiini] #, pperp2ini, Bpolini, Btotini, Bradini, Btorini, psipolini, psitorini, energyini]
         tau_end= tau_start + run_cfg.delta_tau  #t1UL
 
-        logger.info(f'rini= {rini}, thetini= {thetini}, fiini= {fiini}, pparini= {pparini}, energyini= {energyini}')
+        logger.info(f'r= {rini}, thet= {thetini}, fi= {fiini}, ppar= {pparini}')
         logger.info(f't_start(s)= {tau_start*params.R0/ccc*tau_norm}, del_t_calculation(s)= {(tau_end-tau_start)*params.R0/ccc*tau_norm}, time(s)={tau_end*params.R0/ccc*tau_norm}')
         #logger.info(f'solve_ivp: method= DOP853, t_eval={nrange}')
         logger.info(f'solve_ivp: method= DOP853, dense_output=True')
@@ -116,7 +115,7 @@ with pd.HDFStore(file_name, mode='w') as store:
         df['tau'] =  sol.t
 
         logger.debug("\n" + df.head().to_string())
-        logger.info(f"df size= {len(df)}")
+        logger.info(f"df size= {len(df)}, {get_memory_usage()}.")
         # Инкрементная запись в HDF5 
         store.append('trajectory', df, index=False)
         logger.info(f"Iteration {it}. calculation time: {iteration_time:0.2f} sec")

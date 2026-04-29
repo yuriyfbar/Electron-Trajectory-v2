@@ -24,12 +24,12 @@ def setup_logger():
     logger.info(f'Python {sys.version}')
 
 
-def log_memory_usage():
+def get_memory_usage():
     """Logs memory usage of the current process."""
     process = psutil.Process()
     # We get memory in bytes and convert it to megabytes
     mem_info = process.memory_info().rss / 1024 / 1024
-    logger.info(f"Memory usage: {mem_info:.2f} MB")
+    return f"Memory usage: {mem_info:.2f} MB"
 
 # Инициализируем при первом импорте
 setup_logger()
