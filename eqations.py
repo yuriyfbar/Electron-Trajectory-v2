@@ -271,11 +271,11 @@ def eq_mot(t, R0,pperp,ppar,r,thet,fi,R,Uloop,brtr,brtt,brtfi,gbr,gbt,gbfi, \
     dRdtr=M1*brad+M2*bgrr+M3*bbrtr+M4*(Epol*btor-Etor*bpol)
     dRdtt=M1*bpol+M2*bgrt+M3*bbrtt+M4*(Etor*brad-Erad*btor)
     dRdtfi=M1*btor+M2*bgrfi+M3*bbrtfi+M4*(Erad*bpol-Epol*brad)
-    y = [dppardt, dRdtr, dRdtt/r, dRdtfi/R]
+    y = np.array([dppardt, dRdtr, dRdtt/r, dRdtfi/R])
 
     if np.any(np.isnan(y)) or np.any(np.isinf(y)):
         print(y)
-        sys.exit(1)
+        raise ValueError("Обнаружены NaN или Inf в векторе состояния!")
     return y
     # dpperp2dt=muini*(gbr*y2+gbt*y3*r+gbfi*y4*R)
 
