@@ -89,12 +89,31 @@ plt.grid()
 plt.draw() 
 plt.pause(0.1)
 
+from scipy import stats
+slope, intercept, r_value, p_value, std_err = stats.linregress(df['theta'] , df['phi'])
+coeffs = np.polyfit(df['theta'] , df['phi'], 1)
+trend_line = np.poly1d(coeffs)
+
+# Создаем колонку с предсказанными значениями
+df['trend_phi'] = trend_line(df['theta'])
+plt.figure()
+
+plt.scatter(df['theta']%(2*pi), df['phi']-df['trend_phi'], alpha=0.05, color='blue', edgecolors='none', s=10)
+#plt.plot(df['theta'], df['phi']- df['trend_phi'], color='red')
+
+plt.title("theta-phi plot")
+plt.xlabel('theta')
+#plt.ylim(0.,1.0)
+#plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_rto_a.svg')
+plt.grid()
+plt.draw() 
+plt.pause(0.1)
 
 plt.ioff() # Выключаем интерактивный режим
 plt.show() # Блокируем выход, пока вы сами не закроете окна
 
 
-
+sys.exit(0)
 
 rpr=df['r']/a
 thetpr=df['theta']
@@ -124,7 +143,7 @@ thetpr3=thetpr[mmn3:mmx3]
 
 
 
-sys.exit(0)
+
 #print('rini=',sol[nrange-1,1])
 #plt.plot(sol.t, sol.y[1]/a, 'g', label='r(t)/a')
 #rpr=df['rini']/a
@@ -153,23 +172,16 @@ plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_rto_a.svg')
 plt.grid()
 plt.draw() # Принудительная отрисовка
 plt.pause(0.1)
-#print('final t(ms)=',tinipr[mmx-1:mmx])
-#print('final tinipr[mmx]=')
+
 
 plt.figure()
-#print('r[nrange-1]=',sol[nrange-1,1])
-#plt.plot(sol.t, sol.y[1], 'g', label='r(t)')
+
 plt.plot(df['time'], df['r'], 'g', label='r(t)')
 plt.legend(loc='best')
 plt.xlabel('t')
 plt.xlim(15,47)
-#plt.xlim(0.32,0.3351)
-#plt.xlim(0,0.0215)
-#plt.xlim(0.02,0.022)
+
 plt.ylim(0.0,0.601)
-#plt.xlim(47.75,48.1)
-#plt.xlim(46.9,46.95)
-#plt.xlim(0.52,0.53)
 plt.grid()
 plt.figure()
 plt.draw() # Принудительная отрисовка
@@ -193,28 +205,8 @@ plt.plot(tinipr2,enrg2, 'b', label='Energy(eV)')
 #plt.plot(df['t_ini'], df['energyini'], 'g', label='energy(eV)')
 plt.legend(loc='best')
 plt.xlabel('t(s)')
-#plt.xlim(0.508,0.51)
-#plt.xlim(0.31,0.32)
-#plt.xlim(0.629,0.631)
-#plt.xlim(0.221,0.227)
-#plt.xlim(0.3490,0.350)
-#plt.xlim(0.629,0.630)
-#plt.xlim(0.43,0.44)
-#plt.xlim(0.436,0.437)
-#plt.xlim(0.348,0.349)
-#plt.xlim(0.2250,0.2256)
-#plt.xlim(0.02,0.022)
-#plt.xlim(37.71,37.73)
-#plt.ylim(5.7e6,5.8e6)
-#plt.xlim(46.5,46.6)
+
 plt.ylim(0.e7,1.e7)
-#plt.xlim(52.1,52.15)
-#plt.xlim(47.7,48.0)
-#plt.xlim(59.8,59.825)
-#plt.xlim(63.05,63.1)
-#plt.xlim(55.2,55.3)
-#plt.xlim(0.0198,0.02)
-#plt.ylim(7.5e6,7.7e6)
 plt.savefig('pictures/FT2_r_0.01_t_15_p_m0.025_segment_4_Wkin.svg')
 plt.grid()
 plt.show()
