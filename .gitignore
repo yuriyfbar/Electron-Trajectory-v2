@@ -181,3 +181,7 @@ cython_debug/
 .cursorindexingignore
 uv.lock
 *.pkl
+*.prof
+*.lprof
+*.h5
+*.svg

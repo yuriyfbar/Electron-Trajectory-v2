@@ -1,0 +1,38 @@
+[tokamak]
+name = "EXL-50U"
+R0 = 0.80          # [m] Major radius
+a  = 0.6           # [m] Minor radius
+# параметры выше уже используються
+#b = 3.3           # [m] Vertical minor radius (for elongation)
+#wall_material = "Be"
+
+[initial_conditions]
+time_start = 0.2 # [sec]
+num_it = 10
+nrange = 20000
+delta_tau = 200000
+
+ppar = -0.1
+pperp = 0.025
+r =  0.2
+theta = 0
+phi = 0
+
+
+# тут можно придумывать все что угодно
+[discharge.main]
+shot_number = 13976
+B0 = 5.3           # [T] Toroidal field on axis
+Ip = 15.0          # [MA] Plasma current
+Uloop = 0.1        # [V] Loop voltage
+
+[discharge.perturbations]
+n = 0              # Toroidal mode number
+delfi = 0.0       # Relative amplitude
+nfi = 0           # Number of field periods
+delr = 0.0        # Radial perturbation factor
+
+# Начальные условия для солвера (профили)
+[discharge.profiles]
+sf0 = 1.0          # Safety factor on axis
+sfb = 3.5          # Safety factor at boundary
